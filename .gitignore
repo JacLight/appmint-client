@@ -1,0 +1,39 @@
+# ── secrets: never commit anything that authenticates ──────────────────
+.env
+.env.*
+!.env.example
+*.env
+env.json
+secrets.json
+credentials.json
+service-account*.json
+google-services.json
+GoogleService-Info.plist
+firebase*.json
+*.pem
+*.key
+*.p8
+*.p12
+*.jks
+*.keystore
+key.properties
+id_rsa*
+id_ed25519*
+.netrc
+.npmrc
+
+# Dart / Flutter
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+pubspec.lock
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store

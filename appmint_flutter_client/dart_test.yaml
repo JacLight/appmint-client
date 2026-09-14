@@ -1,0 +1,3 @@
+tags:
+  live:
+    description: Talks to a real appengine; needs one reachable at APPMINT_BASE_URL.
