@@ -72,9 +72,10 @@ person's token.
 
 ## Documentation
 
-- [Flutter client](https://docs.appmint.io/docs/flutter-sdk/overview)
-- [Authentication](https://docs.appmint.io/docs/flutter-sdk/authentication)
-- [Making requests](https://docs.appmint.io/docs/flutter-sdk/requests)
+- [Build a Flutter app — tutorial](https://docs.appmint.io/docs/client-integration/flutter-tutorial)
+- [Flutter client](https://docs.appmint.io/docs/client-integration/flutter-client)
+- [Authentication](https://docs.appmint.io/docs/client-integration/flutter-authentication)
+- [Making requests](https://docs.appmint.io/docs/client-integration/flutter-requests)
 - [Example apps](https://github.com/JacLight/appmint-examples)
 
 ## Contributing
