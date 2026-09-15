@@ -98,7 +98,10 @@ class AppmintChatController extends ChangeNotifier {
       queue = null;
       ended = false;
       aiTyping = false;
-      if (changed) _systemLine('assigned', hadAgent ? 'Now talking to ${a.name}' : '${a.name} has joined the conversation');
+      // When an agent picks the chat up the gateway already sends a system
+      // message ("X has joined the chat."); adding our own line here put the
+      // same news in the thread twice. Only a change of agent needs a line.
+      if (changed && hadAgent) _systemLine('assigned', 'Now talking to ${a.name}');
       notifyListeners();
     }));
     _subs.add(service.onTransferred.listen((t) {

@@ -1,3 +1,14 @@
+## 0.1.2
+
+- **Token refresh never worked.** The refresh routes read `refresh_token`;
+  the client sent `refreshToken`, so every refresh was a 400 and every session
+  ended after an hour with "sign in again". Found when the chat socket asked
+  for a fresh token.
+- `auth.refreshSession()` — refresh the access token now and return it, for a
+  socket handshake that was refused as expired.
+- `http.userToken` — the signed-in person's token, for the one place it has
+  to leave the client: a socket handshake. `appmint_flutter_chat` reads it.
+
 ## 0.1.1
 
 Found by building the events example against a live server.

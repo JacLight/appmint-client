@@ -133,6 +133,18 @@ class AppmintAuth {
     return const SignInRejected('Please sign in with your password.');
   }
 
+  /// Trade the refresh token for a new access token, now, and return it.
+  ///
+  /// HTTP calls do this for you on a 401. The one caller that cannot wait
+  /// for a 401 is a socket: the chat gateway refuses an expired token in the
+  /// handshake, and the only way back is a fresh one. Returns null when there
+  /// is nothing to refresh with — the person has to sign in again.
+  Future<String?> refreshSession() async {
+    final token = await _refreshAccessToken();
+    if (token != null) _http.setUserToken(token);
+    return token;
+  }
+
   // ── internals shared by both identities ───────────────────────────────
 
   Future<String?> _refreshAccessToken() async {
@@ -144,7 +156,10 @@ class AppmintAuth {
         identity == Identity.staff
             ? '/profile/user/refresh'
             : '/profile/customer/refresh',
-        body: {'refreshToken': refresh},
+        // The route reads `refresh_token`. Both spellings go, so this keeps
+        // working if the server ever moves to the camel case everything else
+        // in its API uses.
+        body: {'refresh_token': refresh, 'refreshToken': refresh},
         sendUserToken: false,
       );
       final map = res is Map ? Map<String, dynamic>.from(res) : null;

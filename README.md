@@ -6,6 +6,7 @@ backend. One package per platform, one contract between them.
 | Package | Platform | Status |
 |---|---|---|
 | [`appmint_flutter_client`](appmint_flutter_client) | Flutter / Dart | Working |
+| [`appmint_flutter_chat`](appmint_flutter_chat) | Flutter / Dart — support chat screen over the `/chat` socket | Working |
 | [`appmint_js_client`](appmint_js_client) | TypeScript — web, Node, React Native | In progress |
 
 ## What these are for

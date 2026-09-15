@@ -3,7 +3,7 @@ description: >-
   Talk to an Appmint (appengine) backend from Flutter. Handles app
   authentication, staff and customer sign-in including verification
   challenges, and generic reads and writes over any datatype.
-version: 0.1.1
+version: 0.1.2
 publish_to: none
 repository: https://github.com/JacLight/appmint-client
 
