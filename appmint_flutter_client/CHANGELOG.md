@@ -1,5 +1,12 @@
 ## 0.1.2
 
+- `repository.findById` called a route that does not exist
+  (`/repository/findone/…`); it is `/repository/get/:datatype/:id`.
+- **`repository.find` ignored its filter.** The route reads `query` and
+  `options`; the client sent `filter`, `page`, `pageSize` and `sort` at the
+  root, all of which the server ignores — so every search returned the first
+  fifty records of the datatype. Found when the CRM example's timeline showed
+  every lead's history.
 - **Token refresh never worked.** The refresh routes read `refresh_token`;
   the client sent `refreshToken`, so every refresh was a 400 and every session
   ended after an hour with "sign in again". Found when the chat socket asked

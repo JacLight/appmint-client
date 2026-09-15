@@ -47,11 +47,22 @@ class AppmintRepository {
     int pageSize = 50,
     Map<String, dynamic>? sort,
   }) async {
+    // The route reads `query` and `options` and ignores everything else —
+    // silently. A body with the filter at the root is answered with page one
+    // of the whole datatype, which looks like a working call until you
+    // notice every search returns the same fifty rows.
+    final firstSort = sort?.entries.firstOrNull;
     final res = await _http.post('/repository/find/$datatype', body: {
-      'filter': filter ?? <String, dynamic>{},
-      'page': page,
-      'pageSize': pageSize,
-      if (sort != null) 'sort': sort,
+      'query': filter ?? <String, dynamic>{},
+      'options': {
+        'page': page,
+        'pageSize': pageSize,
+        if (firstSort != null) 'sort': firstSort.key,
+        if (firstSort != null)
+          'sortType': firstSort.value is num
+              ? firstSort.value
+              : ('${firstSort.value}'.toLowerCase().startsWith('asc') ? 1 : -1),
+      },
     });
 
     final map = res is Map ? Map<String, dynamic>.from(res) : const {};
@@ -73,7 +84,7 @@ class AppmintRepository {
 
   /// One record by id.
   Future<Map<String, dynamic>?> findById(String datatype, String id) async {
-    final res = await _http.get('/repository/findone/$datatype/$id');
+    final res = await _http.get('/repository/get/$datatype/$id');
     return res is Map ? Map<String, dynamic>.from(res) : null;
   }
 
