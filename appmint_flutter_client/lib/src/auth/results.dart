@@ -76,20 +76,37 @@ class AppmintUser {
         ? Map<String, dynamic>.from(json['data'] as Map)
         : json;
 
-    final first = data['firstName'] as String?;
-    final last = data['lastName'] as String?;
+    final first = _str(data['firstName']);
+    final last = _str(data['lastName']);
     final assembled = [first, last].where((s) => s != null && s.isNotEmpty).join(' ');
 
     return AppmintUser(
       id: (json['sk'] ?? json['id'] ?? data['id'] ?? '').toString(),
       email: (data['email'] ?? data['username'] ?? '').toString(),
-      name: (data['name'] as String?) ??
-          (assembled.isNotEmpty ? assembled : null),
-      phone: data['phone'] as String?,
-      avatar: (data['portrait'] ?? data['avatar']) as String?,
+      name: _str(data['name']) ?? (assembled.isNotEmpty ? assembled : null),
+      phone: _str(data['phone']),
+      avatar: _str(data['portrait']) ?? _str(data['avatar']),
       identity: identity,
       raw: data,
     );
+  }
+
+  /// A field that is a string on most records and something else on a few.
+  /// `portrait` is the known case: on an account whose picture was uploaded
+  /// through the admin console it is a file object, `{ url, path, name … }`,
+  /// not a URL. A hard cast there made sign-in throw for exactly the people
+  /// most likely to be testing: the ones with a profile photo.
+  static String? _str(dynamic v) {
+    if (v == null) return null;
+    if (v is String) return v.isEmpty ? null : v;
+    if (v is Map) {
+      for (final k in ['url', 'path', 'name']) {
+        final inner = v[k];
+        if (inner is String && inner.isNotEmpty) return inner;
+      }
+      return null;
+    }
+    return v.toString();
   }
 
   String get displayName =>

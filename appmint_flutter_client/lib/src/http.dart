@@ -199,7 +199,8 @@ class AppmintHttp {
           await Future<void>.delayed(backoff);
           continue;
         }
-        throw AppmintNetworkException('Network error: ${_short(e)}');
+        throw AppmintNetworkException(
+            'Network error (${e.runtimeType}): ${_short(e)}');
       }
     }
 

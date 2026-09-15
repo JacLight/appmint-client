@@ -1,3 +1,4 @@
+import 'errors.dart';
 import 'http.dart';
 
 /// One page of records.
@@ -105,9 +106,22 @@ class AppmintRepository {
   ) async {
     final res = await _http.put('/repository/create', body: {
       'datatype': datatype,
+      // Without this the server answers "Not a new metrics, please use update
+      // or set the new property" — a sentence that says nothing about what is
+      // missing. The client sends it so nobody has to learn that the hard way.
+      'isNew': true,
       'data': data,
     });
-    return res is Map ? Map<String, dynamic>.from(res) : <String, dynamic>{};
+    if (res is Map && res.isNotEmpty) return Map<String, dynamic>.from(res);
+    // The server keeps the last create it saw and answers an exact repeat of
+    // it with 200 and no body — a guard against double-taps, not an error in
+    // its eyes. Returning `{}` here made callers show a blank row. Say it.
+    throw AppmintException(
+      'The server ignored this create because it was identical to the one '
+      'before it. Change something in the record before sending it again.',
+      statusCode: 200,
+      reason: 'duplicate_create',
+    );
   }
 
   /// Replace a record.
