@@ -48,6 +48,12 @@ class AppmintHttp {
 
   bool get hasUserToken => _userToken != null && _userToken!.isNotEmpty;
 
+  /// The signed-in person's token, for the one place it has to leave the
+  /// client: a socket handshake. A WebSocket cannot carry per-request headers,
+  /// so the chat gateway takes the token in `auth` at connect time. Nothing
+  /// else should read this — every HTTP call attaches it for you.
+  String? get userToken => hasUserToken ? _userToken : null;
+
   /// The person's token, once they have signed in. Setting it does not
   /// validate it — the next call will.
   void setUserToken(String? token) => _userToken = token;

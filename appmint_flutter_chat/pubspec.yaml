@@ -1,0 +1,21 @@
+name: appmint_flutter_chat
+description: Customer-to-agent support chat over the AppEngine /chat gateway. Drop-in screen for any Flutter app; the agent answers from the Appmint admin or Appmint Mobile.
+version: 0.1.0
+repository: https://github.com/JacLight/appmint-client
+publish_to: none
+
+environment:
+  sdk: ^3.7.0
+  flutter: ">=3.27.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  socket_io_client: ^3.0.2
+  http: ^1.2.1
+  flutter_markdown: ^0.7.7
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+
+flutter:
