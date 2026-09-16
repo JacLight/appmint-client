@@ -1,5 +1,11 @@
 ## 0.1.2
 
+- **On the web, every server error was reported as a network error.** The
+  retry loop's `break` inside `try` left the catch handler armed after the
+  loop when compiled to JavaScript, so a 400 parsed afterwards was re-caught
+  and rewrapped as "Network error (AppmintException): …". The Dart VM ran it
+  correctly, which is why the tests never saw it. Restructured without
+  try/catch in the loop.
 - `repository.findById` called a route that does not exist
   (`/repository/findone/…`); it is `/repository/get/:datatype/:id`.
 - **`repository.find` ignored its filter.** The route reads `query` and

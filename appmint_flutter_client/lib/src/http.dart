@@ -191,26 +191,9 @@ class AppmintHttp {
     _log('$method $path');
     final started = DateTime.now();
 
-    http.Response? res;
-    for (var attempt = 1; attempt <= config.transientRetries; attempt++) {
-      if (_appToken == null) await appToken();
-      try {
-        res = await _dispatch(method, uri, _headers(sendUserToken), encoded);
-        break;
-      } catch (e) {
-        if (_isTransient(e) && attempt < config.transientRetries) {
-          final backoff = Duration(milliseconds: 400 * attempt);
-          _log('$method $path attempt $attempt failed (${_short(e)}); '
-              'retrying in ${backoff.inMilliseconds}ms');
-          await Future<void>.delayed(backoff);
-          continue;
-        }
-        throw AppmintNetworkException(
-            'Network error (${e.runtimeType}): ${_short(e)}');
-      }
-    }
+    final res = await _attempt(method, path, uri, sendUserToken, encoded);
 
-    if (res!.statusCode == 401 && !retriedAfterRenew) {
+    if (res.statusCode == 401 && !retriedAfterRenew) {
       // A 401 is ambiguous: either the app token aged out or the person's did.
       // Renew the app token first — it is free and needs nobody — and only
       // then conclude the session is what expired.
@@ -241,6 +224,40 @@ class AppmintHttp {
 
     _emit(method, path, res.statusCode, started, sendUserToken);
     return _read(res);
+  }
+
+  /// Send once, retrying only failures that never reached the server.
+  ///
+  /// Deliberately no try/catch around a loop with `break` in it: compiled to
+  /// JavaScript, that shape left the catch handler armed after the loop, so
+  /// a perfectly good 400 from the server — parsed later, thrown as an
+  /// [AppmintException] — was re-caught here and reported as a network
+  /// error. The Dart VM ran the same code correctly, which is why it took a
+  /// browser to notice. Errors are taken off the future instead.
+  Future<http.Response> _attempt(
+    String method,
+    String path,
+    Uri uri,
+    bool sendUserToken,
+    String? encoded,
+  ) async {
+    var attempt = 1;
+    while (true) {
+      if (_appToken == null) await appToken();
+      final outcome = await _dispatch(method, uri, _headers(sendUserToken), encoded)
+          .then<Object>((r) => r, onError: (Object e) => e);
+      if (outcome is http.Response) return outcome;
+      if (_isTransient(outcome) && attempt < config.transientRetries) {
+        final backoff = Duration(milliseconds: 400 * attempt);
+        _log('$method $path attempt $attempt failed (${_short(outcome)}); '
+            'retrying in ${backoff.inMilliseconds}ms');
+        await Future<void>.delayed(backoff);
+        attempt++;
+        continue;
+      }
+      throw AppmintNetworkException(
+          'Network error (${outcome.runtimeType}): ${_short(outcome)}');
+    }
   }
 
   /// Multipart upload against a path that accepts a `file` field.
